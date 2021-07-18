@@ -23,7 +23,7 @@ public class ExtensionVerifier {
     public void verifyFiles() throws IOException {
         System.out.println("=====================================================================\n");
         if (files.length == 0) {
-            System.out.println("No files provided");
+            System.out.println("No files provided\n\n=====================================================================");
             return;
         }
         for (String filePath : files) {
