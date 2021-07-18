@@ -1,22 +1,16 @@
 package ExtensionVerifier;
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class FileExtensionGetter {
-
-    public String getExtensionFromName(String fileName) {
-        for (int i = fileName.length() - 1; i >= 0; i--) {
-            if (fileName.charAt(i) == '.' || fileName.charAt(i) == '/')
-                return fileName.substring(i + 1);
-        }
-        return fileName;
-    }
-
-    public Extension getActualExtension(String filePath, String extensionFromPath) throws IOException {
-    //beacuse txt files do not have their magic numbers, I had to find an another way to verify them
+public class ExtensionFromFileGetter implements IFileExtensionGetter{
+    @Override
+    public String getExtension(String filePath, String extensionFromPath) throws IOException {
+        //because txt files do not have their magic numbers, I had to find an another way to verify them
         if (extensionFromPath.equals("txt"))
             return verifyTextExtension(filePath);
 
@@ -28,21 +22,21 @@ public class FileExtensionGetter {
 
             for (Extension type : fileTypes) {
                 if (header.startsWith(type.getValue())) {
-                    return type;
+                    return type.toString();
                 }
             }
         }
-        return null;
+        return "other";
     }
 
-    private Extension verifyTextExtension(String filePath) throws IOException {
+    private String verifyTextExtension(String filePath) throws IOException {
         Path path = FileSystems.getDefault().getPath(filePath);
         String mimeType = Files.probeContentType(path);
 
         if (!mimeType.equals("text/plain"))
             throw new IllegalArgumentException("Invalid extension provided");
 
-        return Extension.TXT;
+        return Extension.TXT.toString();
     }
 
     private String getHeader(String filePath) {

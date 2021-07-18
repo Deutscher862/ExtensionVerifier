@@ -5,13 +5,15 @@ import java.util.ArrayList;
 
 public class ExtensionVerifier {
     private final String[] files;
-    private final ArrayList<String> handledExtensions;
-    private final FileExtensionGetter fileExtensionGetter;
+    private static ArrayList<String> handledExtensions;
+    private static ExtensionFromPathGetter extensionFromPathGetter;
+    private static ExtensionFromFileGetter extensionFromFileGetter;
 
     public ExtensionVerifier(String[] fileNames) {
         this.files = fileNames;
-        this.fileExtensionGetter = new FileExtensionGetter();
-        this.handledExtensions = new ArrayList<>();
+        ExtensionVerifier.handledExtensions = new ArrayList<>();
+        ExtensionVerifier.extensionFromPathGetter = new ExtensionFromPathGetter();
+        ExtensionVerifier.extensionFromFileGetter = new ExtensionFromFileGetter();
 
         for (Extension e : Extension.values()) {
             handledExtensions.add(e.toString());
@@ -32,20 +34,15 @@ public class ExtensionVerifier {
     }
 
     private void verifyFile(String filePath) throws IOException {
-        String extensionFromPath = fileExtensionGetter.getExtensionFromName(filePath);
+        String extensionFromPath = extensionFromPathGetter.getExtension(filePath, null);
 
         if (!handledExtensions.contains(extensionFromPath))
             throw new IllegalArgumentException("File can not be handled");
 
-        Extension extensionFromFile = fileExtensionGetter.getActualExtension(filePath, extensionFromPath);
-        String actualExtension;
-        if (extensionFromFile == null)
-            actualExtension = "other";
-        else
-            actualExtension = extensionFromFile.toString();
+        String actualExtension = extensionFromFileGetter.getExtension(filePath, extensionFromPath);
 
         System.out.println("given extension: " + extensionFromPath
-                + " actual extension: " + actualExtension);
+                        + " actual extension: " + actualExtension);
 
         if (extensionFromPath.equals(actualExtension))
             System.out.println("OK");
