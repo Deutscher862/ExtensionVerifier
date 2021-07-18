@@ -1,14 +1,15 @@
 package ExtensionVerifier;
 
+import java.io.*;
 import java.util.ArrayList;
 
 public class ExtensionVerifier {
     private final String[] files;
-    private final FileExtensionGetter fileExtensionGetter;
     private final ArrayList<String> handledExtensions;
+    private final FileExtensionGetter fileExtensionGetter;
 
-    public ExtensionVerifier(String[] filePaths) {
-        this.files = filePaths;
+    public ExtensionVerifier(String[] fileNames) {
+        this.files = fileNames;
         this.fileExtensionGetter = new FileExtensionGetter();
         this.handledExtensions = new ArrayList<>();
 
@@ -17,7 +18,7 @@ public class ExtensionVerifier {
         }
     }
 
-    public void verifyFiles(){
+    public void verifyFiles() throws IOException {
         System.out.println("=====================================================================\n");
         if (files.length == 0) {
             System.out.println("No files provided");
@@ -30,6 +31,25 @@ public class ExtensionVerifier {
         System.out.println("\n=====================================================================");
     }
 
-    private void verifyFile(String filePath){
+    private void verifyFile(String filePath) throws IOException {
+        String extensionFromPath = fileExtensionGetter.getExtensionFromName(filePath);
+
+        if (!handledExtensions.contains(extensionFromPath))
+            throw new IllegalArgumentException("File can not be handled");
+
+        Extension extensionFromFile = fileExtensionGetter.getActualExtension(filePath, extensionFromPath);
+        String actualExtension;
+        if (extensionFromFile == null)
+            actualExtension = "other";
+        else
+            actualExtension = extensionFromFile.toString();
+
+        System.out.println("given extension: " + extensionFromPath
+                + " actual extension: " + actualExtension);
+
+        if (extensionFromPath.equals(actualExtension))
+            System.out.println("OK");
+        else
+            throw new IllegalArgumentException("Invalid extension provided");
     }
 }
