@@ -2,7 +2,6 @@ package ExtensionVerifier;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -39,31 +38,30 @@ public class ExtensionFromFileGetter implements IFileExtensionGetter{
         return Extension.TXT.toString();
     }
 
-    private String getHeader(String filePath) {
-        byte[] bytes = new byte[28];
 
-        try (InputStream inputStream = new FileInputStream(filePath)) {
-            inputStream.read(bytes, 0, 28);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private String getHeader(String filePath) throws IOException {
+        byte[] bytes = new byte[16];
+
+        FileInputStream inputStream = new FileInputStream(filePath);
+        int no_bytes_read = inputStream.read(bytes);
 
         return changeToHex(bytes);
     }
 
-    public static String changeToHex(byte[] bytes) {
-        StringBuilder stringBuilder = new StringBuilder();
-        if (bytes == null || bytes.length <= 0)
-            return null;
+public static String changeToHex(byte[] bytes) {
+    StringBuilder stringBuilder = new StringBuilder();
+    if (bytes == null || bytes.length <= 0)
+        return null;
 
-        for (byte b : bytes) {
-            int value = b & 0xFF;
-            String hexString = Integer.toHexString(value);
-            if (hexString.length() < 2) {
-                stringBuilder.append(0);
-            }
-            stringBuilder.append(hexString);
+    for (byte b : bytes) {
+        int value = b & 0xFF;
+        String hexString = Integer.toHexString(value);
+        if (hexString.length() < 2) {
+            stringBuilder.append(0);
         }
-        return stringBuilder.toString();
+        stringBuilder.append(hexString);
     }
+    return stringBuilder.toString();
+}
+
 }
