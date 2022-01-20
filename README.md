@@ -6,9 +6,6 @@ This project will allow you to verify the extensions of the selected files. The 
 * jpg/jpeg
 * png
 * pdf
-* doc
-* docx
-* html
 
 How to run the program:
 
